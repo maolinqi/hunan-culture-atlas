@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080e11">
+  <meta name="description" content="探索湖湘文化的联系。交互式文化星图，包含聚焦、分支展开、缩放与流光粒子。">
+  <title>湘 · 文化星图</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23080e11'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='40' fill='%23dbc59b'%3E湘%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app">
+    <div class="atmosphere" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="湘文化星图首页"><span class="seal">湘</span><span class="brand-name">文化星图<small>HUNAN CULTURAL ATLAS</small></span></a>
+      <nav class="view-tabs" aria-label="图谱布局">
+        <button data-layout="atlas" class="active" aria-pressed="true"><span>✧</span> 星图</button>
+        <button data-layout="orbit" aria-pressed="false"><span>◎</span> 轨道</button>
+        <button data-layout="thread" aria-pressed="false"><span>⌘</span> 脉络</button>
+      </nav>
+      <div class="header-actions">
+        <button id="language-toggle" class="language-toggle" aria-label="切换为 English" title="Switch to English">EN</button>
+        <div class="search-wrap"><span aria-hidden="true">⌕</span><input id="search" type="search" autocomplete="off" placeholder="寻找一个文化坐标" aria-label="搜索文化名词" aria-controls="search-results"><kbd>/</kbd><div id="search-results" class="search-results" hidden></div></div>
+        <button id="settings-open" class="icon-button" aria-label="动效设置" title="动效设置">◈</button>
+        <button id="immersive" class="icon-button" aria-label="切换沉浸模式" aria-pressed="false" title="沉浸模式">⛶</button>
+      </div>
+    </header>
+
+    <section id="stage" aria-label="湖南文化知识图谱，可拖动、缩放、点击节点">
+      <canvas id="graph-canvas" aria-hidden="true"></canvas>
+      <div id="node-layer"></div>
+      <div id="edge-tooltip" class="edge-tooltip" hidden></div>
+      <div class="stage-caption" aria-hidden="true"><span class="eyebrow">A LIVING CONSTELLATION</span><p>山水有迹<span>文脉相连</span></p><i></i></div>
+      <div id="focus-caption" class="focus-caption" hidden></div>
+    </section>
+
+    <aside class="explorer" aria-label="文化主题">
+      <div class="eyebrow">EXPLORE HUNAN</div><h1>探索湖湘</h1>
+      <p class="explorer-intro">循一束光，见一方文化。</p>
+      <div id="categories" class="category-list"></div>
+      <div class="explorer-bottom"><button id="expand-all"><span>⊕</span> 展开全部</button><button id="collapse-all"><span>⊖</span> 收起全部</button></div>
+      <div class="legend"><span><i class="dot gold"></i>文化主题</span><span><i class="dot jade"></i>文化名词</span><span><i class="line"></i>主题归类</span><span><i class="line dashed"></i>资料关联</span></div>
+    </aside>
+
+    <aside id="inspector" class="inspector" aria-label="节点信息">
+      <div class="inspector-top"><span class="eyebrow">当前焦点 / FOCUS</span><button id="close-inspector" class="icon-button" aria-label="关闭信息面板">×</button></div>
+      <div id="inspector-content"></div>
+    </aside>
+    <button id="reopen-inspector" class="panel-reopen" hidden aria-label="打开节点信息">详情 ↗</button>
+
+    <footer class="bottom-bar">
+      <div class="graph-stats"><span class="live-dot"></span><strong id="node-count">49</strong> 个节点 <span class="divider">/</span> <strong id="edge-count"></strong> 条联系<small>湖南文化 · 示例图谱</small></div>
+      <div class="graph-controls" aria-label="图谱操作"><button id="zoom-out" aria-label="缩小" title="缩小">−</button><span id="zoom-level">100%</span><button id="zoom-in" aria-label="放大" title="放大">+</button><i></i><button id="reset" aria-label="回到全景" title="回到全景">⌖</button><i></i><button id="tour" aria-pressed="false"><span>▷</span> 漫游</button></div>
+      <div class="bottom-right"><span class="interaction-hint">拖动平移 · 滚轮缩放 · 双击展开</span><button id="sources-open">参考资料 ↗</button></div>
+    </footer>
+
+    <dialog id="settings-dialog" class="settings-dialog"><form method="dialog"><div class="dialog-heading"><div><span class="eyebrow">ATMOSPHERE</span><h2>光与运动</h2></div><button class="icon-button" aria-label="关闭动效设置">×</button></div></form><p>为探索调节星图的呼吸。</p><label>浮游微粒<input id="particles-toggle" type="checkbox" checked role="switch"></label><label>关系流光<input id="flow-toggle" type="checkbox" checked role="switch"></label><label>呼吸与涟漪<input id="breathe-toggle" type="checkbox" checked role="switch"></label><label class="range-label">动效强度 <span id="intensity-label">60%</span><input id="intensity" type="range" min="0" max="100" value="60" aria-label="动效强度"></label><div class="settings-note" id="motion-note">动效可以关闭，图谱仍可正常探索。</div></dialog>
+
+    <dialog id="sources-dialog" class="sources-dialog"><form method="dialog"><div class="dialog-heading"><div><span class="eyebrow">RESEARCH & REFERENCES</span><h2>文化与视觉参考</h2></div><button class="icon-button" aria-label="关闭参考资料">×</button></div></form><p>文化名词由人工选编。主题归类用于视觉演示；资料关联附有来源。这里呈现的是图谱前端。</p><div id="sources-list"></div></dialog>
+    <div id="toast" role="status" aria-live="polite"></div>
+  </main>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
